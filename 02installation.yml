@@ -1,5 +1,5 @@
 ---
-- name: Post Installation MySQL and prepare for custom data directory
+- name: Installation PosgtreSQL and prepare for Stream Replication
   hosts: all
   become: yes
   vars_files:
