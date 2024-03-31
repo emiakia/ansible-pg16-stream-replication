@@ -6,40 +6,12 @@
     - vars.yaml
 
   tasks:
-    # - name: Copy Bash script to remote server
-    #   copy:
-    #     src: ./bash/create-db-user.sh
-    #     dest: /tmp/my_script.sh
-    #     mode: '0755'
 
-    # - name: Add user to sudoers with no password prompt
-    #   ansible.builtin.lineinfile:
-    #     path: /etc/sudoers
-    #     regexp: '^{{ username }} ALL=\(ALL\) NOPASSWD: ALL'
-    #     line: '{{ username }} ALL=(ALL) NOPASSWD: ALL'
-    #     validate: 'visudo -cf %s'
-    #   vars:
-    #     username: "kia"
 
     - name: Run Create replusr user
       become: yes
       become_user: postgres
       command: psql -x -c "CREATE USER replusr REPLICATION LOGIN CONNECTION LIMIT 5 ENCRYPTED PASSWORD '1';"
-      
-    # - name: Execute the script
-    #   command: /tmp/my_script.sh
-    #   register: result
-
-    # - name: Check execution result
-    #   debug:
-    #     msg: "Script output: {{ result.stdout }}"
-    #   when: result.rc == 0
-
-    # - name: Delete the Bash script
-    #   file:
-    #     path: /tmp/my_script.sh
-    #     state: absent
-    #   ignore_errors: yes  # Optional: continue even if delete fails
 
     - name: Create PostgreSQL archive directory
       file:

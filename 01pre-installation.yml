@@ -29,39 +29,6 @@
         create: yes
       when: inventory_hostname == 'server1' or inventory_hostname == 'server2'
 
-    # - name: Set password-less SSH
-    #   authorized_key:
-    #     user: "{{ ssh_user }}"
-    #     state: present
-    #     key: "{{ lookup('file', ssh_key_path) }}"
-    
-
-    # - name: Allow SSH port 3306 through UFW
-    #   ufw:
-    #     rule: allow
-    #     name: 'SSH'
-    #     port: '22'
-    #     proto: tcp
-
-    # - name: Enable UFW
-    #   ufw:
-    #     state: enabled
-
-    # - name: Allow MySQL port 3306 through UFW
-    #   ufw:
-    #     rule: allow
-    #     name: 'MySQL'
-    #     port: '3306'
-    #     proto: tcp
-
-    # - name: Allow MySQL port 3306 through iptables
-    #   iptables:
-    #     chain: INPUT
-    #     destination_port: 3306
-    #     protocol: tcp
-    #     state: present
-    #     jump: ACCEPT
-
     - name: Reboot the server
       reboot:
         reboot_timeout: 300  # Timeout in seconds to wait for reboot to complete
