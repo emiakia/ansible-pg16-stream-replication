@@ -1,5 +1,5 @@
 ---
-- name: Post Installation MySQL and prepare for custom data directory
+- name: Post Installation PostgreSQL on Standby
   hosts: server2
   become: yes
   vars_files:

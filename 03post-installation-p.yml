@@ -1,5 +1,5 @@
 ---
-- name: Post Installation PostgreSQL
+- name: Post Installation PostgreSQL on Primary
   hosts: server1
   become: yes
   vars_files:
