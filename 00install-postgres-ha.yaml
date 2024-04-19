@@ -1,0 +1,19 @@
+---
+- name: Run 01pre-installation
+  import_playbook: 01pre-installation.yml
+
+- name: Run 02installation
+  import_playbook: 02installation.yml
+
+- name: Run 03post-installation-p
+  import_playbook: 03post-installation-p.yml
+
+- name: Run 04post-installation-s
+  import_playbook: 04post-installation-s.yml
+
+- name: Run 05checking-p
+  import_playbook: 05checking-p.yml
+
+- name: Run 06checking-s
+  import_playbook: 06checking-s.yml
+

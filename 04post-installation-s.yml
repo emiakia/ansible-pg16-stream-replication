@@ -6,6 +6,10 @@
     - vars.yaml
 
   tasks:
+    - name: Stop PostgreSQL service
+      ansible.builtin.systemd:
+        name: postgresql
+        state: stopped
     - name: Create PostgreSQL archive directory
       file:
         path: /var/lib/postgresql/16/main/archive
