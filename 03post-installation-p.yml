@@ -1,5 +1,5 @@
 ---
-- name: Post Installation MySQL and prepare for custom data directory
+- name: Post Installation PostgreSQL
   hosts: server1
   become: yes
   vars_files:
@@ -11,6 +11,15 @@
     #     src: ./bash/create-db-user.sh
     #     dest: /tmp/my_script.sh
     #     mode: '0755'
+
+    # - name: Add user to sudoers with no password prompt
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/sudoers
+    #     regexp: '^{{ username }} ALL=\(ALL\) NOPASSWD: ALL'
+    #     line: '{{ username }} ALL=(ALL) NOPASSWD: ALL'
+    #     validate: 'visudo -cf %s'
+    #   vars:
+    #     username: "kia"
 
     - name: Run Create replusr user
       become: yes
@@ -39,6 +48,13 @@
         owner: postgres
         group: postgres
         mode: '0770'
+
+    - name: Change wal_level = replica
+      lineinfile:
+        path: /etc/postgresql/16/main/postgresql.conf
+        regexp: "#listen_addresses = 'localhost'"
+        line: "listen_addresses = '*'"
+        state: present
 
     - name: Change wal_level = replica
       lineinfile:

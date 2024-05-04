@@ -30,7 +30,7 @@
 
     - name: Run pg_basebackup as postgres user
       become: yes
-      # become_user: postgres
+      become_user: postgres
       command: pg_basebackup -R -h {{ ip_server1 }} -D /var/lib/postgresql/16/main -U replusr -P --wal-method=stream
       environment:
         PGPASSWORD: "1"  # If you need to pass the password for the replication user
