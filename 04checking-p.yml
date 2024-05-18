@@ -4,7 +4,6 @@
   become: yes
   vars_files:
     - vars.yaml
-
   tasks:
     - name: Run pg_stat_replication
       become: yes
