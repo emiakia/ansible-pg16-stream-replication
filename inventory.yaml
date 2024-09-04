@@ -1,0 +1,9 @@
+all:
+  hosts:
+    server1:
+      ansible_host: "{{ ip_address_1 }}"
+    server2:
+      ansible_host: "{{ ip_address_2 }}"
+  vars:
+    ansible_user: "{{ ansible_user }}"
+    ansible_ssh_private_key_file: "{{ ssh_private_key_path }}"

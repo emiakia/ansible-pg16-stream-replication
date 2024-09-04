@@ -1,0 +1,141 @@
+# playbooks/install_mysql.yaml
+
+- name: MySQL Installation and Configuration
+  hosts: all
+  become: true
+  vars_files:
+    - config/vars.yaml
+
+  tasks:
+    # - name: Reboot the server
+    #   reboot:
+    #     reboot_timeout: 60  # Timeout in seconds
+    #   register: reboot_result
+
+    # - name: Wait for server to become available
+    #   wait_for:
+    #     port: 22
+    #     delay: 60  # Wait for 1 minute
+    #     timeout: 300  # Timeout in seconds
+    #   when: reboot_result is succeeded
+
+    - name: Install required packages
+      yum:
+        name:
+          - binutils
+          - compat-libcap1
+          - compat-libstdc++-33
+          - cloog-ppl
+          - cpp
+          - chrony
+          - gcc
+          - gcc-c++
+          - glibc
+          - glibc-devel
+          - glibc-headers
+          - ksh
+          - kernel-headers
+          - libgcc
+          - libstdc++
+          - libstdc++-devel
+          - libaio
+          - libaio-devel
+          - libdmx
+          - libXext
+          - libXtst
+          - libX11
+          - libXau
+          - libxcb
+          - libXi
+          - libXxf86misc
+          - make
+          - mpfr
+          - sysstat
+          - libXmu
+          - libXt
+          - libXv
+          - libXxf86dga
+          - libdmx
+          - libXxf86misc
+          - libXxf86vm
+          - xorg-x11-utils
+          - xorg-x11-xauth
+          - nfs-utils
+          - smartmontools
+          - ntp
+          - unzip
+          - net-tools.x86_64
+          - pciutils
+          - sysfsutils
+          - system-storage-manager
+        state: present
+
+    - name: Install MySQL RPMs
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - mysql-commercial-backup-8.0.33-1.1.el7.x86_64.rpm
+        - mysql-commercial-client-8.0.33-1.1.el7.x86_64.rpm
+        - mysql-commercial-client-plugins-8.0.33-1.1.el7.x86_64.rpm
+        - mysql-commercial-common-8.0.33-1.1.el7.x86_64.rpm
+        - mysql-commercial-devel-8.0.33-1.1.el7.x86_64.rpm
+        - mysql-commercial-embedded-compat-8.0.33-1.1.el7.x86_64.rpm
+        - mysql-commercial-icu-data-files-8.0.33-1.1.el7.x86_64.rpm
+        - mysql-commercial-libs-8.0.33-1.1.el7.x86_64.rpm
+        - mysql-commercial-libs-compat-8.0.33-1.1.el7.x86_64.rpm
+        - mysql-commercial-server-8.0.33-1.1.el7.x86_64.rpm
+        - mysql-commercial-test-8.0.33-1.1.el7.x86_64.rpm
+        - mysql-router-commercial-8.0.33-1.1.el7.x86_64.rpm
+      become: true
+
+    - name: Check MySQL service status
+      command: systemctl status mysqld
+      register: mysql_status
+      ignore_errors: yes
+
+    - name: Start MySQL service
+      service:
+        name: mysqld
+        state: started
+        enabled: yes
+
+    - name: Change shell for MySQL users
+      user:
+        name: "{{ item }}"
+        shell: /bin/bash
+      with_items:
+        - mysql
+        - mysqlrouter
+
+    - name: Create MySQL data directory
+      file:
+        path: /dbdata
+        state: directory
+        owner: mysql
+        group: mysql
+        mode: '0755'
+
+    - name: Set home directory for MySQL user
+      user:
+        name: mysql
+        home: /dbdata
+
+    - name: Set MySQL root password
+      mysql_user:
+        name: root
+        password: "123"
+        host_all: yes
+        state: present
+
+    - name: Configure sudoers for MySQL user
+      lineinfile:
+        path: /etc/sudoers
+        line: "DBAUSERS ALL=(ALL) NOPASSWD: DBACMD"
+        state: present
+        validate: '/usr/sbin/visudo -cf %s'
+      vars:
+        sudoers_line: |
+          User_Alias DBAUSERS = mysql
+          Cmnd_Alias DBACMD = /bin/systemctl status mysqld.service, /bin/systemctl start mysqld.service, /bin/systemctl stop mysqld.service, /bin/systemctl restart mysqld.service
+          DBAUSERS ALL=(ALL) NOPASSWD: DBACMD
