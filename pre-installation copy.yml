@@ -35,14 +35,6 @@
     #     state: present
     #     key: "{{ lookup('file', ssh_key_path) }}"
     
-
-    # - name: Allow SSH port 3306 through UFW
-    #   ufw:
-    #     rule: allow
-    #     name: 'SSH'
-    #     port: '22'
-    #     proto: tcp
-
     # - name: Enable UFW
     #   ufw:
     #     state: enabled

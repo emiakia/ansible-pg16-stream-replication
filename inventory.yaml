@@ -1,4 +1,3 @@
-# inventory.yaml
 all:
   hosts:
     server1:

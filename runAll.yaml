@@ -1,0 +1,10 @@
+---
+- name: Run Multiple Playbooks
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Pre Installation
+      import_playbook: pre-installation.yml
+
+    - name: Installation
+      import_playbook: installation.yml

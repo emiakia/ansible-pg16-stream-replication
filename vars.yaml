@@ -9,10 +9,15 @@ hostname_server2: "mysql-02"
 ip_server1: "192.168.174.192"
 ip_server2: "192.168.174.193"
 
-# Password for MySQL root user
-mysql_root_password: "123"
 
 # SSH configuration
 ssh_user: "kia"
 
 ssh_key_path: "/home/{{ ssh_user }}/.ssh/id_rsa.pub"
+
+
+# User and Password of MySQL 
+mysql_root_password: ""
+mysql_new_password: "AAAaaa123!"
+mysql_new_user: "kia"
+mysql_new_user_password: "kia_password"

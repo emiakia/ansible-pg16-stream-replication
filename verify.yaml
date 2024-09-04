@@ -1,0 +1,15 @@
+- name: verify
+  hosts: all
+  become: yes
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: Check MySQL connection
+      mysql_db:
+        name: mysql
+        state: present
+      register: result
+
+    - name: Display result
+      debug:
+        var: result

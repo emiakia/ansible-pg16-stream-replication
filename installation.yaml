@@ -1,0 +1,113 @@
+---
+- name: Install and Secure MySQL Server
+  hosts: all
+  become: yes
+  vars_files:
+    - vars.yaml
+  vars:
+    mysql_root_password: "{{ your_root_password }}"
+    mysql_new_password: "{{ your_new_password }}"
+    mysql_new_user: "{{ mysql_new_user }}"
+    mysql_new_user_password: "{{ mysql_new_user_password }}"
+  
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install MySQL Server and related packages
+      package:
+        name:
+          - mysql-server
+          - mysql-client
+          - python3-mysqldb
+          - libmysqlclient-dev
+        state: present
+        update_cache: yes
+
+    - name: Ensure MySQL is running
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+
+    - name: Run MySQL commands to secure installation
+      mysql_db:
+        name: "{{ item.db_name }}"
+        state: present
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+      loop:
+        - { db_name: "mysql" }
+
+    - name: Update MySQL root user password
+      mysql_user:
+        name: root
+        password: "{{ mysql_new_password }}"
+        state: present
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+    
+    - name: Remove anonymous users
+      mysql_query:
+        query: "DELETE FROM mysql.user WHERE User='';"
+        login_user: root
+        login_password: "{{ mysql_new_password }}"
+
+    - name: Disallow root login remotely
+      mysql_query:
+        query: "DELETE FROM mysql.user WHERE User='root' AND Host!='localhost';"
+        login_user: root
+        login_password: "{{ mysql_new_password }}"
+
+    - name: Remove test database
+      mysql_query:
+        query: "DROP DATABASE IF EXISTS test;"
+        login_user: root
+        login_password: "{{ mysql_new_password }}"
+
+    - name: Reload privilege tables
+      mysql_query:
+        query: "FLUSH PRIVILEGES;"
+        login_user: root
+        login_password: "{{ mysql_new_password }}"
+    
+    - name: Reload privilege tables
+      mysql_query:
+        query: "FLUSH PRIVILEGES;"
+        login_user: root
+        login_password: "{{ mysql_new_password }}"
+
+    - name: Create an Admin User
+      mysql_query:
+        query: "CREATE USER '{{ mysql_new_user}}'@'%' IDENTIFIED BY '{{ mysql_new_user_password }}';"
+        login_user: root
+        login_password: "{{ mysql_new_password }}"
+
+    - name: Grant to Admin User
+      mysql_query:
+        query: "GRANT ALL PRIVILEGES ON *.* TO '{{ mysql_new_user }}'@'%';"
+        login_user: root
+        login_password: "{{ mysql_new_password }}"
+
+    # - name: Create MySQL user 'kia' with all privileges
+    #   mysql_user:
+    #     name: "{{ mysql_new_user }}"
+    #     password: "{{ mysql_new_user_password }}"
+    #     priv: "*.*:ALL"
+    #     state: present
+    #     login_user: root
+    #     login_password: "{{ mysql_new_password }}"
+
+    - name: Comment out bind-address and add new bind-address in MySQL config
+      replace:
+        path: /etc/mysql/mysql.conf.d/mysqld.cnf
+        regexp: '^bind-address\s*=\s*127\.0\.0\.1'
+        replace: '#bind-address = 127.0.0.1\nbind-address = 0.0.0.0'
+
+    - name: Restart MySQL service
+      service:
+        name: mysql
+        state: restarted
+
+
