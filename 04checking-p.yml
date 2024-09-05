@@ -1,0 +1,12 @@
+---
+- name: Check Standby
+  hosts: server1
+  become: yes
+  vars_files:
+    - vars.yaml
+
+  tasks:
+    - name: Run pg_stat_replication
+      become: yes
+      become_user: postgres
+      command: psql -x -c "select * from pg_stat_replication;"
